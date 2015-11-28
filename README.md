@@ -10,7 +10,7 @@ the guitar playing chords, and then the vocals). I try to leverage that informat
 
     python layer_separation.py <audio_file>
 
-To run the algorithm. The audio file can be an .mp3 or a .wav, whatever librosa can accept.
+The audio file can be an .mp3 or a .wav, whatever librosa can accept. A new folder will be created with separations that you can browse through. 
 
 NOTE: I had to edit the non-negative matrix factorization in scikit-learn to get the algorithm to work, so I've included 
 my edited version of the library here.
