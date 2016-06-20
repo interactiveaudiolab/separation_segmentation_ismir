@@ -525,8 +525,12 @@ def _fit_coordinate_descent(X, W, H, tol=1e-4, max_iter=200, alpha=0.001,
         transformation (W), both or none of them.
 
     update_H : boolean, default: True
-        Set to True, both W and H will be estimated from initial guesses.
-        Set to False, only W will be estimated.
+        Set to True, H will be estimated from initial guesses.
+        Set to False, H will be static.
+    
+	update_W : boolean, default: True
+        Set to True, W will be estimated from initial guesses.
+        Set to False, W will be static.
 
     verbose : integer, default: 0
         The verbosity level.
