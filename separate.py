@@ -2,7 +2,6 @@ from functions import *
 import librosa
 import numpy as np
 import matplotlib.pyplot as plt
-import peakutils
 from scipy.spatial.distance import cosine
 from scipy.signal import correlate
 from scipy.stats import skew
@@ -80,7 +79,7 @@ def find_inflection_point(errors, beats, music_stft, start, parameters):
 		candidates = [len(errors) - 1]
 	peak = candidates[0]
 	#print 'Going to beat %d - %f seconds' % (peak + start, librosa.frames_to_time(beats[peak])[0])
-	return beats[peak] - 4, peak + start, candidates
+	return beats[peak] - 4, peak + start
 	
 
 from scipy.spatial.distance import cosine
@@ -106,10 +105,10 @@ def frame_similarity_matrix(music_stft, beats):
 
 def find_first_beat_with_activity(music, sr, beats, start):
 	beats = librosa.frames_to_time(beats)
-	music = music[beats[start]*sr:]
+	music = music[int(beats[int(start)]*sr):]
 	total_rms = np.sqrt(np.mean(music*music))
 	for i, b in enumerate(beats[start:]):
-		sig = music[beats[i]*sr:beats[i+1]*sr]
+		sig = music[int(beats[i]*sr):int(beats[i+1]*sr)]
 		rms = np.sqrt(np.mean(sig*sig))
 		#print i, b, rms, total_rms/20
 		if rms > total_rms/20:
@@ -121,6 +120,7 @@ def get_layer(music, sr, start, beats=None, parameters=None):
 		music_stft = librosa.stft(music)
 	else:
 		music_stft, beats = segment_into_beats(music, sr)
+        beats = [int(b) for b in beats]
 	if parameters is None:
 		parameters = {'p': 5.5, 'q': .25, 'lag': 16}
 	start = find_first_beat_with_activity(music, sr, beats, start)

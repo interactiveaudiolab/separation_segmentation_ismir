@@ -1,8 +1,6 @@
 import numpy as np
 import librosa
-from nussl import Repet, RepetType, AudioSignal
 from sklearn.decomposition import NMF
-import peakutils
 from scipy.spatial.distance import cosine
 
 def find_template(music_stft, sr, min_t, n_components, start, end):
