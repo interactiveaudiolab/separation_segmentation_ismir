@@ -29,8 +29,13 @@ def segment_into_beats(music, sr):
 	music_stft = librosa.stft(music)
 	return music_stft, beats
 
-def beat_sync_error(music_stft, beats, sr):
-	comps, acts = find_template(music_stft, sr, 8, 9, beats[0], beats[7])
+def quantize_track(music, sr):
+    quantization = np.arange(0, len(music)/float(sr), .1)
+    quantization = [int(b) for b in librosa.time_to_frames(quantization)]
+    return quantization
+
+def beat_sync_error(music_stft, beats, sr, n_components):
+	comps, acts = find_template(music_stft, sr, n_components, n_components + 1, beats[0], beats[7])
 	errors = extract_reconstruction_error_beats(comps, music_stft, beats)
 	return errors
 
@@ -115,7 +120,7 @@ def find_first_beat_with_activity(music, sr, beats, start):
 			break
 	return i + start
 
-def get_layer(music, sr, start, beats=None, parameters=None):
+def get_layer(music, sr, start, beats=None, parameters=None, n_components = 8):
 	if beats is not None:
 		music_stft = librosa.stft(music)
 	else:
@@ -124,25 +129,27 @@ def get_layer(music, sr, start, beats=None, parameters=None):
 	if parameters is None:
 		parameters = {'p': 5.5, 'q': .25, 'lag': 16}
 	start = find_first_beat_with_activity(music, sr, beats, start)
-	errors = beat_sync_error(music_stft, beats[start:], sr)
+	errors = beat_sync_error(music_stft, beats[start:], sr, n_components)
 	inflection_point, beat = find_inflection_point(errors, beats[start:], music_stft, start, parameters)
 	print 'Going from beat %d to %d' % (start, beat)
-	comps, acts = find_template(music_stft, sr, 8, 9, beats[start], inflection_point)
+	comps, acts = find_template(music_stft, sr, n_components, n_components + 1, beats[start], inflection_point)
 	template, residual = extract_template(comps, music_stft)
 	template_error = get_template_error(music_stft, beats, comps)
 	return template, residual, errors, beats, inflection_point, beat, template_error, start
 
-def extract_all_layers(music_path, parameters=None):
+def extract_all_layers(music_path, parameters=None, n_components = 8, beats = None):
 	music, sr, music_stft = load_file(music_path)
+	if beats == 'quantize':
+		beats = quantize_track(music, sr)
 	original_rms = np.sqrt(np.mean(music*music))
 	layers = []
 	boundaries = []
-	template, residual, errors, beats, inflection_point, beat, template_error, start = get_layer(music, sr, 0, parameters=parameters)
+	template, residual, errors, beats, inflection_point, beat, template_error, start = get_layer(music, sr, 0, beats=beats, parameters=parameters, n_components=n_components)
 	while True:
 		layers.append(librosa.istft(template))
 		boundaries.append(beats[beat])
 		print 'LAYER: ' + str(len(layers))
-		if np.sqrt(np.mean(music*music)) < original_rms/10:
+		if np.sqrt(np.mean(music*music)) < original_rms/5:
 			print 'Residual rms too low, terminating'
 			break
 		if beat >= len(beats)-8:
