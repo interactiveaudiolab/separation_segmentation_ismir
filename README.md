@@ -1,16 +1,11 @@
-# Audio layer separation algorithm
+# Simultaneous Separation and Segmentation in Layered Music
 
-## Description
+### Prem Seetharaman and Bryan Pardo, ISMIR 2016
 
-This is a separation algorithm that exploits the "layering" structure at the beginning of songs. 
-The basic idea is that a song will sometimes start in layers (e.g. the drums, then the bass a measure later, then
-the guitar playing chords, and then the vocals). I try to leverage that information to do source separation.
+The included demo notebook presents the separation/segmentation algorithm presented in the following paper:
 
-## Usage
+> http://music.cs.northwestern.edu/publications/seetharaman_pardo_ismir16.pdf
 
-    python layer_separation.py <audio_file>
+To cite this work:
 
-The audio file can be an .mp3 or a .wav, whatever librosa can accept. A new folder will be created with separations that you can browse through. 
-
-NOTE: I had to edit the non-negative matrix factorization in scikit-learn to get the algorithm to work, so I've included 
-my edited version of the library here.
+>Seetharaman, Prem, and Bryan Pardo. "Simultaneous separation and segmentation in layered music." 17th Interational Society for Music Information Retrieval. 2016.
